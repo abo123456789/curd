@@ -34,7 +34,7 @@ class HbaseConnection(MysqlConnection):
         cursor = conn.cursor(cursor_factory=phoenixdb.cursor.DictCursor)
         return conn, cursor
 
-    def _execute(self, query, params, timeout):
+    def _execute(self, query, params, timeout, cursor='execute'):
         if not self.cursor:
             self.connect(self._conf)
 
@@ -73,8 +73,12 @@ class HbaseConnection(MysqlConnection):
             else:
                 raise
 
+    def create_all(self, collection, data, mode='INSERT', compress_fields=None, **kwargs):
+        raise NotImplementedError('not supported')
+
     def update(self, collection, data, filters, **kwargs):
-        raise phoenixdb.errors.NotSupportedError('hbase do not support update, use create with insert/replace mode instead')
+        raise phoenixdb.errors.NotSupportedError(
+            'hbase do not support update, use create with insert/replace mode instead')
 
     def delete(self, collection, filters, **kwargs):
         filters = self._check_filters(filters)
@@ -100,7 +104,7 @@ class HbaseConnection(MysqlConnection):
             4. UPSERT instead of REPLACE
             5. '?' instead of '%s'
         """
-        new_query = query.replace('`', '"').replace('%s', '?')\
+        new_query = query.replace('`', '"').replace('%s', '?') \
             .replace('REPLACE INTO', 'UPSERT INTO').replace('INSERT INTO', 'UPSERT INTO')
         if 'INSERT IGNORE INTO' in new_query:
             new_query = new_query.replace('INSERT IGNORE INTO', 'UPSERT INTO') + ' ON DUPLICATE KEY IGNORE'

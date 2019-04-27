@@ -18,7 +18,7 @@ class ConnectError(WrappedError):
     '''
     errors when connect to database
     '''
-    
+
     BASE_MESSAGE = 'ConnectError'
 
 
@@ -26,7 +26,7 @@ class UnexpectedError(WrappedError):
     '''
     uncategorized errors
     '''
-    
+
     BASE_MESSAGE = 'UnexpectedError'
 
 
@@ -34,7 +34,7 @@ class OperationFailure(WrappedError):
     '''
     errors like timeout, mysql gone away, retriable
     '''
-    
+
     BASE_MESSAGE = 'OperationFailure'
 
 
@@ -44,3 +44,4 @@ class ProgrammingError(WrappedError):
 
 class DuplicateKeyError(Error):
     pass
+

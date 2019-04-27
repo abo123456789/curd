@@ -1,16 +1,18 @@
 from datetime import datetime, timezone
 
+from curd import UnexpectedError
+
 
 class BaseClause(object):
     def __init__(self, field, value):
         self._field = field
         self._value = value
-        
+
     @property
     def field(self):
         return '.'.join(
             ['`{}`'.format(i) for i in self._field.replace('`', '').split('.')])
-    
+
     @property
     def value(self):
         if isinstance(self._value, datetime) and self._value.tzinfo:
@@ -27,8 +29,8 @@ class BaseClause(object):
             return value
         else:
             return self._value
-        
-        
+
+
 class WhereClause(BaseClause):
     def __init__(self, field, operator, value):
         super().__init__(field, value)
@@ -38,17 +40,17 @@ class WhereClause(BaseClause):
                 self._operator = 'IS'
             elif self._operator == '!=':
                 self._operator = 'IS NOT'
-        
+
     @property
     def operator(self):
         return self._operator
-        
-        
+
+
 class FieldClause(BaseClause):
     def __init__(self, field):
         self._field = field
 
-    
+
 class AssignmentClause(BaseClause):
     pass
 
@@ -57,13 +59,13 @@ class BaseSQLStatement(object):
     def __init__(self):
         self.query = None
         self.params = []
-    
+
     def generate_query_field(self, table):
         return table.field
-    
+
     def generate_query_where(self, where):
         query = ''
-        
+
         if where:
             query += 'WHERE '
             segs = []
@@ -74,10 +76,10 @@ class BaseSQLStatement(object):
                         '{} {} {}'.format(
                             where_clause.field,
                             where_clause.operator,
-                            '({})'.format(', '.join(['%s']*value_count))
+                            '({})'.format(', '.join(['%s'] * value_count))
                         )
                     )
-                    
+
                     for v in where_clause.value:
                         self.params.append(v)
                 else:
@@ -95,13 +97,13 @@ class BaseSQLStatement(object):
             return ', '.join([field_clause.field for field_clause in fields])
         else:
             return '*'
-        
+
     def generate_query_limit(self, limit):
         if limit:
             return 'LIMIT {}'.format(limit)
         else:
             return ''
-        
+
     def generate_query_order_by(self, order_by):
         query = ''
         if order_by:
@@ -120,7 +122,7 @@ class BaseSQLStatement(object):
 
 class SelectStatement(BaseSQLStatement):
     BASE_QUERY = 'SELECT {} FROM {} {}'
-    
+
     def __init__(self, table, fields=None, where=None, order_by=None, limit=None):
         super().__init__()
 
@@ -129,14 +131,14 @@ class SelectStatement(BaseSQLStatement):
         self.where = where
         self.order_by = order_by
         self.limit = limit
-        
+
     def as_sql(self):
         query_table = self.generate_query_field(self.table)
         query_fields = self.generate_query_fields(self.fields)
         query_where = self.generate_query_where(self.where)
         query_order_by = self.generate_query_order_by(self.order_by)
         query_limit = self.generate_query_limit(self.limit)
-    
+
         extra_query = ' '.join([
             i for i in [query_where, query_order_by, query_limit] if i
         ])
@@ -146,8 +148,8 @@ class SelectStatement(BaseSQLStatement):
         )
 
         return self.query, self.params
-    
-    
+
+
 class DeleteStatement(BaseSQLStatement):
     BASE_QUERY = 'DELETE FROM {} {}'
 
@@ -155,28 +157,28 @@ class DeleteStatement(BaseSQLStatement):
         super().__init__()
         self.table = table
         self.where = where
-    
+
     def as_sql(self):
         query_table = self.generate_query_field(self.table)
         query_where = self.generate_query_where(self.where)
         extra_query = query_where
-    
+
         self.query = self.BASE_QUERY.format(
             query_table, extra_query
         )
         return self.query, self.params
-    
-    
+
+
 class CreateStatement(BaseSQLStatement):
     BASE_QUERY = '{} INTO {} ({}) VALUES ({})'
-    
+
     def __init__(self, table, assignments, mode, compress_fields):
         super().__init__()
         self.table = table
         self.assignments = assignments
         self.mode = mode
         self.compress_fields = compress_fields
-        
+
     def generate_query_mode(self, mode):
         if mode == 'INSERT':
             return 'INSERT'
@@ -184,46 +186,46 @@ class CreateStatement(BaseSQLStatement):
             return 'INSERT IGNORE'
         elif mode == 'REPLACE':
             return 'REPLACE'
-        
+
     def generate_query_fields_values(self, assignments, compress_fields):
         fields = [a.field for a in assignments]
-        query_values = ['%s']*len(assignments)
+        query_values = ['%s'] * len(assignments)
         if type(compress_fields) == list:
             for index, field in enumerate(fields):
                 for cf in compress_fields:
-                    if '`'+cf+'`' == field:  # field should be like '`id`'
+                    if '`' + cf + '`' == field:  # field should be like '`id`'
                         query_values[index] = 'COMPRESS(%s)'
         query_fields = ', '.join(fields)
         query_values = ', '.join(query_values)
         for a in assignments:
             self.params.append(a.value)
         return query_fields, query_values
-    
+
     def as_sql(self):
-        
+
         query_mode = self.generate_query_mode(self.mode)
-        
+
         query_table = self.generate_query_field(self.table)
-        
+
         query_fields, query_values = self.generate_query_fields_values(
             self.assignments, self.compress_fields
         )
-        
+
         self.query = self.BASE_QUERY.format(
             query_mode, query_table, query_fields, query_values
         )
         return self.query, self.params
-    
-    
+
+
 class UpdateStatement(BaseSQLStatement):
     BASE_QUERY = 'UPDATE {} SET {} {}'
-    
+
     def __init__(self, table, assignments, where=None):
         super().__init__()
         self.table = table
         self.assignments = assignments
         self.where = where
-        
+
     def generate_query_fields_values(self, assignments):
         query = ', '.join(
             [a.field + '=%s' for a in assignments]
@@ -234,17 +236,17 @@ class UpdateStatement(BaseSQLStatement):
 
     def as_sql(self):
         query_table = self.generate_query_field(self.table)
-    
+
         query_fields_values = self.generate_query_fields_values(
             self.assignments)
 
         query_where = self.generate_query_where(self.where)
-    
+
         self.query = self.BASE_QUERY.format(
             query_table, query_fields_values, query_where
         )
         return self.query, self.params
-    
+
 
 def where_clauses_from_filters(filters):
     where_clauses = []
@@ -266,6 +268,30 @@ def query_parameters_from_create(collection, data, mode='INSERT', compress_field
     table = FieldClause(collection)
     assignments = assignment_clauses_clauses_from_filters(data)
     query, params = CreateStatement(table, assignments, mode, compress_fields).as_sql()
+    return query, params
+
+
+def query_parameters_from_create_all(collection, data, mode='INSERT', compress_fields=None):
+    table = FieldClause(collection)
+    assignments = [assignment_clauses_clauses_from_filters(each) for each in data]
+    query = None
+    params = []
+    _item_length = None
+    for index, assignment in enumerate(assignments):
+        _query, _params = CreateStatement(table, assignment, mode, compress_fields).as_sql()
+
+        # check each item length
+        if _item_length is None:
+            _item_length = len(_params)
+        else:
+            if len(_params) != _item_length:
+                raise UnexpectedError(
+                    'Deceived data varies in length, expecting all equal %s, but got %s(%s)' % (
+                        _item_length, len(_params), data[index]))
+
+        if query is None:
+            query = _query
+        params.append(_params)
     return query, params
 
 
@@ -297,13 +323,13 @@ def query_parameters_from_filter(
     table = FieldClause(collection)
     where = where_clauses_from_filters(filters)
     fields = [FieldClause(f) for f in (fields or [])]
-    
+
     if order_by is None:
         order_by = []
     elif isinstance(order_by, str):
         order_by = [order_by]
     order_by = [FieldClause(f) for f in order_by]
-    
+
     query, params = SelectStatement(
         table, fields, where, order_by, limit).as_sql()
     return query, params
