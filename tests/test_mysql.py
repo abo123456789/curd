@@ -23,6 +23,3 @@ def test_mysql():
     normal_filter(session, create_test_table)
     filter_with_order_by(session, create_test_table)
     thread_pool(session, create_test_table)
-
-
-

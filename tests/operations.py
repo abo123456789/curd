@@ -31,22 +31,22 @@ def create_all(session, create_test_table):
 
     data = [{'id': 100, 'text': 'test'}, {'id': 200, 'text': 'test200'}, {'id': 300, 'text': 'test300'}]
 
-    session.create_all(collection, data)
+    session.create_many(collection, data)
     with pytest.raises(DuplicateKeyError):
-        session.create_all(collection, data, mode='insert')
+        session.create_many(collection, data, mode='insert')
 
     assert data == session.execute('select * from {}'.format(collection))
 
     time.sleep(10)
     data2 = [{'id': 100, 'text': 'testplus'}, {'id': 200, 'text': 'test200plus'}, {'id': 300, 'text': 'test300plus'}]
-    session.create_all(collection, data2, mode='replace')
+    session.create_many(collection, data2, mode='replace')
 
     assert data != session.execute('select * from {}'.format(collection))
 
     time.sleep(10)
     data3 = [{'id': 100, 'text': 'testplus'}, {'id': 200}, {'id': 300, 'text': 'test300plus'}]
     with pytest.raises(UnexpectedError):
-        session.create_all(collection, data3, mode='ignore')
+        session.create_many(collection, data3, mode='ignore')
 
 
 def update(session, create_test_table):

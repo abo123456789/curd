@@ -286,7 +286,7 @@ def query_parameters_from_create_all(collection, data, mode='INSERT', compress_f
         else:
             if len(_params) != _item_length:
                 raise UnexpectedError(
-                    'Deceived data varies in length, expecting all equal %s, but got %s(%s)' % (
+                    'Received data varies in length, expecting all equal %s, but got %s(%s)' % (
                         _item_length, len(_params), data[index]))
 
         if query is None:

@@ -34,7 +34,7 @@ class HbaseConnection(MysqlConnection):
         cursor = conn.cursor(cursor_factory=phoenixdb.cursor.DictCursor)
         return conn, cursor
 
-    def _execute(self, query, params, timeout, cursor='execute'):
+    def _execute(self, query, params, timeout, cursor_func='execute'):
         if not self.cursor:
             self.connect(self._conf)
 
@@ -73,7 +73,7 @@ class HbaseConnection(MysqlConnection):
             else:
                 raise
 
-    def create_all(self, collection, data, mode='INSERT', compress_fields=None, **kwargs):
+    def create_many(self, collection, data, mode='INSERT', compress_fields=None, **kwargs):
         raise NotImplementedError('not supported')
 
     def update(self, collection, data, filters, **kwargs):

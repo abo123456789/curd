@@ -159,6 +159,9 @@ class MysqlConnection(BaseConnection):
             else:
                 return rows
 
+    def executemany(self, query, params=None, retry=None, timeout=None, cursor_func='executemany'):
+        return self.executemany(query, params, retry, timeout, cursor_func=cursor_func)
+
     def create(self, collection, data, mode='INSERT', compress_fields=None, **kwargs):
         query, params = query_parameters_from_create(
             collection, data, mode.upper(), compress_fields
@@ -171,7 +174,7 @@ class MysqlConnection(BaseConnection):
             else:
                 raise
 
-    def create_all(self, collection, data, mode='INSERT', compress_fields=None, **kwargs):
+    def create_many(self, collection, data, mode='INSERT', compress_fields=None, **kwargs):
         if not isinstance(data, list):
             data = [data, ]
 
