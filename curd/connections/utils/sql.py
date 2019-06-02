@@ -271,7 +271,7 @@ def query_parameters_from_create(collection, data, mode='INSERT', compress_field
     return query, params
 
 
-def query_parameters_from_create_all(collection, data, mode='INSERT', compress_fields=None):
+def query_parameters_from_create_many(collection, data, mode='INSERT', compress_fields=None):
     table = FieldClause(collection)
     assignments = [assignment_clauses_clauses_from_filters(each) for each in data]
     query = None

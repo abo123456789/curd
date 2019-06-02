@@ -1,6 +1,6 @@
 from .operations import (
     create, delete, normal_filter, filter_with_order_by, thread_pool, update,
-    create_all)
+    create_many)
 
 from curd import Session
 from .conf import mysql_conf
@@ -17,7 +17,7 @@ def create_test_table(session):
 def test_mysql():
     session = Session([mysql_conf])
     create(session, create_test_table)
-    create_all(session, create_test_table)
+    create_many(session, create_test_table)
     update(session, create_test_table)
     delete(session, create_test_table)
     normal_filter(session, create_test_table)

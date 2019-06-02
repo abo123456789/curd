@@ -11,7 +11,7 @@ DEFAULT_TIMEOUT = 3600 * 10
 CREATE_MODE = ('INSERT', 'IGNORE', 'REPLACE')
 FILTER_OP = ('<', '>', '>=', '<=', '=', '!=', 'IN')
 CURD_FUNCTIONS = (
-    'create', 'update', 'get', 'delete', 'filter', 'exist', 'execute', 'create_all'
+    'create', 'update', 'get', 'delete', 'filter', 'exist', 'execute', 'create_many'
 )
 
 OP_RETRY_WARNING = 'RETRY: {}'

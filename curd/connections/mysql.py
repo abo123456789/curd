@@ -16,7 +16,7 @@ from .utils.sql import (
     query_parameters_from_update,
     query_parameters_from_delete,
     query_parameters_from_filter,
-    query_parameters_from_create_all)
+    query_parameters_from_create_many)
 from . import (
     BaseConnection, DEFAULT_FILTER_LIMIT, DEFAULT_TIMEOUT, OP_RETRY_WARNING,
     CURD_FUNCTIONS
@@ -178,7 +178,7 @@ class MysqlConnection(BaseConnection):
         if not isinstance(data, list):
             data = [data, ]
 
-        query, params = query_parameters_from_create_all(
+        query, params = query_parameters_from_create_many(
             collection, data, mode.upper(), compress_fields
         )
         try:

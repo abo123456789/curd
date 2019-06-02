@@ -26,7 +26,7 @@ def create(session, create_test_table):
     assert data != session.get(collection, [('=', 'id', 100)])
 
 
-def create_all(session, create_test_table):
+def create_many(session, create_test_table):
     collection = create_test_table(session)
 
     data = [{'id': 100, 'text': 'test'}, {'id': 200, 'text': 'test200'}, {'id': 300, 'text': 'test300'}]
