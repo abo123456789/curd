@@ -160,7 +160,7 @@ class MysqlConnection(BaseConnection):
                 return rows
 
     def executemany(self, query, params=None, retry=None, timeout=None, cursor_func='executemany'):
-        return self.executemany(query, params, retry, timeout, cursor_func=cursor_func)
+        return self.execute(query, params, retry, timeout, cursor_func=cursor_func)
 
     def create(self, collection, data, mode='INSERT', compress_fields=None, **kwargs):
         query, params = query_parameters_from_create(
