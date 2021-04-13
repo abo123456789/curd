@@ -1,11 +1,9 @@
 import json
-from functools import partial
 from collections import OrderedDict
+from functools import partial
 
 from .connections import CURD_FUNCTIONS
-
 from .errors import ProgrammingError
-
 
 DB_CONNECTION_POOL = {}
 
@@ -79,15 +77,16 @@ class Session(object):
         }
     }
     """
-    
+
     def __init__(self, dbs=None):
         self._connection_cache = OrderedDict()
         self._default_connection = None
-        
-        if dbs:
-            for db in dbs:
+        self.dbs = dbs
+
+        if self.dbs:
+            for db in self.dbs:
                 self._get_connection(db)
-        
+
     def _create_connection(self, db):
         class_conn_pool = DB_CONNECTION_POOL.get(db['type'], None)
         if class_conn_pool:
@@ -97,7 +96,7 @@ class Session(object):
                 raise ProgrammingError('no database driver')
             else:
                 raise ProgrammingError('not supported database')
-        
+
     def set_default_connection(self, db):
         key = json.dumps(db)
         conn = self._connection_cache.get(key, None)
@@ -105,7 +104,7 @@ class Session(object):
             conn = self._create_connection(db)
             self._connection_cache[key] = conn
         self._default_connection = conn
-        
+
     def _get_connection(self, db):
         key = json.dumps(db)
         conn = self._connection_cache.get(key, None)
@@ -114,18 +113,23 @@ class Session(object):
         else:
             conn = self._create_connection(db)
             self._connection_cache[key] = conn
-            
+
             if not self._default_connection:
                 self._default_connection = conn
-            
+
             return conn
-        
+
+    @property
+    def db_types(self):
+        ts = [d['type'] for d in self.dbs]
+        return set(ts)
+
     def using(self, db=None):
         if db:
             return self._get_connection(db)
         else:
             return self._default_connection
-        
+
     def __getattr__(self, item):
         if item in CURD_FUNCTIONS:
             if self._default_connection:
@@ -134,7 +138,7 @@ class Session(object):
                 raise ProgrammingError('no database conf')
         else:
             raise AttributeError
-            
+
     def close(self):
         for k, v in self._connection_cache.items():
             v.close()
@@ -145,25 +149,25 @@ class Session(object):
 class F(object):
     def __init__(self, value):
         self._value = value
-    
+
     def __eq__(self, other):
         return '=', self._value, other
-    
+
     def __ne__(self, other):
         return '!=', self._value, other
-    
+
     def __lt__(self, other):
         return '<', self._value, other
-    
+
     def __le__(self, other):
         return '<=', self._value, other
-    
+
     def __gt__(self, other):
         return '>', self._value, other
-    
+
     def __ge__(self, other):
         return '>=', self._value, other
-    
+
     def __lshift__(self, other):
         return 'IN', self._value, other
 
@@ -174,7 +178,7 @@ class SimpleCollection(object):
         self.path = path
         self.timeout = timeout
         self.retry = retry
-        
+
         for func in CURD_FUNCTIONS:
             setattr(
                 self,
