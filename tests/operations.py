@@ -26,24 +26,26 @@ def create(session, create_test_table):
     assert data != session.get(collection, [('=', 'id', 100)])
 
 
-def create_many(session, create_test_table):
+def create_many(session, create_test_table, skip_duplicate_error=False):
     collection = create_test_table(session)
 
     data = [{'id': 100, 'text': 'test'}, {'id': 200, 'text': 'test200'}, {'id': 300, 'text': 'test300'}]
 
     session.create_many(collection, data)
-    with pytest.raises(DuplicateKeyError):
-        session.create_many(collection, data, mode='insert')
+
+    if not skip_duplicate_error:
+        with pytest.raises(DuplicateKeyError):
+            session.create_many(collection, data, mode='insert')
 
     assert data == session.execute('select * from {}'.format(collection))
 
-    time.sleep(10)
+    time.sleep(2)
     data2 = [{'id': 100, 'text': 'testplus'}, {'id': 200, 'text': 'test200plus'}, {'id': 300, 'text': 'test300plus'}]
     session.create_many(collection, data2, mode='replace')
 
     assert data != session.execute('select * from {}'.format(collection))
 
-    time.sleep(10)
+    time.sleep(2)
     data3 = [{'id': 100, 'text': 'testplus'}, {'id': 200}, {'id': 300, 'text': 'test300plus'}]
     with pytest.raises(UnexpectedError):
         session.create_many(collection, data3, mode='ignore')

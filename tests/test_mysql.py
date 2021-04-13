@@ -1,9 +1,9 @@
-from .operations import (
+from tests.operations import (
     create, delete, normal_filter, filter_with_order_by, thread_pool, update,
     create_many)
 
 from curd import Session
-from .conf import mysql_conf
+from tests.conf import mysql_conf
 
 
 def create_test_table(session):

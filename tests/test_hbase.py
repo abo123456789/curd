@@ -1,19 +1,21 @@
 import time
+
 import pytest
-from .operations import (
-    delete, normal_filter, filter_with_order_by, thread_pool, update
-)
 from phoenixdb.errors import NotSupportedError
 
 from curd import Session
-from .conf import hbase_conf
+from tests.conf import hbase_conf
+from tests.operations import (
+    delete, normal_filter, filter_with_order_by, thread_pool, update,
+    create_many)
 
-    
+
 def create_test_table(session):
-    session.execute('CREATE SCHEMA IF NOT EXISTS "curd"')
-    session.execute('DROP TABLE IF EXISTS "curd"."test"')
-    session.execute("""CREATE TABLE IF NOT EXISTS "curd"."test" ("id" bigint NOT NULL, "text" varchar, CONSTRAINT pk PRIMARY KEY ("id")) DATA_BLOCK_ENCODING='FAST_DIFF', COMPRESSION = 'GZ'""")
-    return 'curd.test'
+    session.execute('CREATE SCHEMA IF NOT EXISTS CURD')
+    session.execute('DROP TABLE IF EXISTS CURD.TEST')
+    session.execute(
+        """CREATE TABLE IF NOT EXISTS CURD.TEST ("id" bigint NOT NULL, "text" varchar, CONSTRAINT pk PRIMARY KEY ("id")) DATA_BLOCK_ENCODING='FAST_DIFF', COMPRESSION = 'GZ'""")
+    return 'CURD.TEST'
 
 
 def create(session, create_test_table):
@@ -48,6 +50,9 @@ def test_hbase():
     print('>>>>>>>>>>>>>> test create <<<<<<<<<<<<<<<<<')
     create(session, create_test_table)
 
+    print('>>>>>>>>>>>>>> test create <<<<<<<<<<<<<<<<<')
+    create_many(Session([hbase_conf]), create_test_table, True)
+
     print('>>>>>>>>>>>>>> test update <<<<<<<<<<<<<<<<<')
     update(session, create_test_table)
 
@@ -62,4 +67,3 @@ def test_hbase():
 
     print('>>>>>>>>>>>>>> test multi thread create <<<<<<<<<<<<<<<<<')
     thread_pool(session, create_test_table, size=100)
-
