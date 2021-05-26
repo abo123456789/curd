@@ -168,6 +168,7 @@ class MysqlConnection(BaseConnection):
         query, params = query_parameters_from_create(
             collection, data, mode.upper(), compress_fields
         )
+        query = self.adapt_standard_query(query)
         try:
             self.execute(query, params, **kwargs)
         except ProgrammingError as e:
@@ -183,6 +184,7 @@ class MysqlConnection(BaseConnection):
         query, params = query_parameters_from_create_many(
             collection, data, mode.upper(), compress_fields
         )
+        query = self.adapt_standard_query(query)
         try:
             self.execute(query, params, cursor_func='executemany', **kwargs)
         except ProgrammingError as e:
@@ -191,14 +193,20 @@ class MysqlConnection(BaseConnection):
             else:
                 raise
 
+    @staticmethod
+    def adapt_standard_query(query):
+        return query
+
     def update(self, collection, data, filters, **kwargs):
         filters = self._check_filters(filters)
         query, params = query_parameters_from_update(collection, filters, data)
+        query = self.adapt_standard_query(query)
         self.execute(query, params, **kwargs)
 
     def delete(self, collection, filters, **kwargs):
         filters = self._check_filters(filters)
         query, params = query_parameters_from_delete(collection, filters)
+        query = self.adapt_standard_query(query)
         self.execute(query, params, **kwargs)
 
     def filter(self, collection, filters=None, fields=None,
@@ -206,6 +214,7 @@ class MysqlConnection(BaseConnection):
         filters = self._check_filters(filters)
         query, params = query_parameters_from_filter(
             collection, filters, fields, order_by, limit)
+        query = self.adapt_standard_query(query)
         rows = self.execute(query, params, **kwargs)
         return rows
 
