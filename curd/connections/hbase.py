@@ -48,7 +48,7 @@ class HbaseConnection(MysqlConnection):
             raise ProgrammingError(origin_error=e)
         except Exception as e:
             errs = phoenixdb.errors
-            if any(map(lambda x: isinstance(e, x), [errs.InternalError, errs.OperationalError])):
+            if any(map(lambda x: isinstance(e, x), [errs.InternalError, errs.OperationalError, BrokenPipeError])):
                 raise OperationFailure(origin_error=e)  # will retry
             else:
                 raise UnexpectedError(origin_error=e)
