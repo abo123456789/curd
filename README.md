@@ -1,8 +1,13 @@
 # Curd, A Database Client
 
 ## Quick start
+#### Install
 
+```
+pip install curd2
+```
 
+#### demo
 ```python
 from curd import Session
 
@@ -22,16 +27,6 @@ collection = 'test.test'
 item = {'id': 1, 'text': 'test'}
 
 session.create(collection, item)
-```
-
-
-## Install
-
-Install with database driver as extras require (reduce install time)
-
-```
-pip install curd[mysql]
-pip install curd[cassandra]
 ```
 
 ## Feature
