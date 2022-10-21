@@ -2,7 +2,7 @@ from .operations import (
     create, delete, normal_filter, thread_pool, update, timeout
 )
 
-from curd import Session
+from curd2 import Session
 from .conf import cassandra_conf
 
     

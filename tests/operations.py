@@ -5,7 +5,7 @@ import time
 from multiprocessing.pool import ThreadPool
 from threading import current_thread
 
-from curd import DuplicateKeyError, OperationFailure, UnexpectedError
+from curd2 import DuplicateKeyError, OperationFailure, UnexpectedError
 
 
 def create(session, create_test_table):

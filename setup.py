@@ -3,8 +3,8 @@ from setuptools import setup, find_packages
 
 setup(
     name='curd2',
-    version='0.0.13',
-    url='https://github.com/abo123456789/curd',
+    version='0.0.14',
+    url='https://github.com/abo123456789/curd2',
     description='db operations',
     author='jdxin0',
     author_email='jdxin00@gmail.com',

@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from curd import UnexpectedError
+from curd2 import UnexpectedError
 
 
 class BaseClause(object):

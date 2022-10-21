@@ -8,8 +8,9 @@ pip install curd2
 ```
 
 #### demo
+
 ```python
-from curd import Session
+from curd2 import Session
 
 mysql_conf = {
     'type': 'mysql',

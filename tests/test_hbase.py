@@ -3,7 +3,7 @@ import time
 import pytest
 from phoenixdb.errors import NotSupportedError
 
-from curd import Session
+from curd2 import Session
 from tests.conf import hbase_conf
 from tests.operations import (
     delete, normal_filter, filter_with_order_by, thread_pool, update,
