@@ -1,4 +1,4 @@
-# Curd, A Database Client
+# Curd2, A Database Client
 
 ## Quick start
 #### Install
