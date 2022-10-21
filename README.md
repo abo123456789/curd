@@ -31,7 +31,7 @@ session.create(collection, item)
 ```
 
 ## Feature
-1. Supported databases: cassandra / mysql (tidb `tidb_patch`).
+1. Supported databases: cassandra / mysql (tidb `tidb_patch`)/PolarDB.
 2. Supported operations: `create`, `filter`, `update`, `delete`, `exist`. 
    You can use `execute` for other operations (complex query).
 3. Multiple threads/processes supported, you can share `Session` whatever you like.
